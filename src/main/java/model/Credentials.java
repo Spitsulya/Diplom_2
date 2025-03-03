@@ -25,11 +25,11 @@ public class Credentials {
 
     // передаем неверный логин
     public static Credentials invalidLogin(UserData userData) {
-        return new Credentials("invalidLogin", userData.getPassword());
+        return new Credentials("invalidLogin@yandex.ru", userData.getPassword());
     }
 
     // передаем неверный пароль
     public static Credentials invalidPassword(UserData userData) {
-        return new Credentials(userData.getEmail(), "invalidPassword");
+        return new Credentials(userData.getEmail(), "invalidPassword@yandex.ru");
     }
 }
