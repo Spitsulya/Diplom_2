@@ -2,13 +2,11 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import model.Credentials;
 import model.UserData;
 import client.BurgerServiceClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -16,6 +14,7 @@ public class TestCreateUser {
 
     private UserData userData;
     private BurgerServiceClient client;
+    String userAccessToken;
 
     @Before
     public void setUp() {
@@ -27,7 +26,7 @@ public class TestCreateUser {
     @Description("Positive test for POST request to /api/auth/register endpoint by filling in all required fields")
     public void CreateUserSucessfullyTest() {
 
-        userData = new UserData("maalishka15@yandex.ru", "password", "elina");
+        userData = new UserData("maalishhka15@yandex.ru", "password", "elina");
         ValidatableResponse response = client.createUserPostRequest(userData);
 
         checkStatusCode200(response);
@@ -75,16 +74,8 @@ public class TestCreateUser {
 
     @After
     public void tearDown() {
-        String userAccessToken = null;
+        userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
 
-        try {
-            userAccessToken = client.authorizeUser(Credentials.fromUserData(userData))
-                    .extract().path("accessToken"); // Получаем accessToken, если запрос успешен
-        } catch (Exception e) {
-            System.out.println("Authorization failed or user does not exist. Skipping deletion.");
-        }
-
-        // Удаляем пользователя, если accessToken получен
         if (userAccessToken != null) {
             client.deleteUser(userAccessToken);
         }

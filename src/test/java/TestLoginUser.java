@@ -16,12 +16,13 @@ public class TestLoginUser {
 
     private UserData userData;
     private BurgerServiceClient client;
+    String userAccessToken;
 
     @Before
     public void setUp() {
         client = new BurgerServiceClient();
-        userData = new UserData("lychshaya15@yandex.ru", "password", "Elina");
-        client.createUserPostRequest(userData);
+        userData = new UserData("llllllaaaaa@yandex.ru", "password", "Elina");
+        userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
     }
 
     @Test
@@ -62,9 +63,6 @@ public class TestLoginUser {
 
     @After
     public void tearDown() {
-        String userAccessToken = client.authorizeUser(Credentials.fromUserData(userData))
-                .extract().path("accessToken");
-
         if (userAccessToken != null) {
             client.deleteUser(userAccessToken);
         }

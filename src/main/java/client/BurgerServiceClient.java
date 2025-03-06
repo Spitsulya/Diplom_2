@@ -1,13 +1,13 @@
 package client;
-
 import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 import model.UserData;
 import model.constants.Endpoints;
 import model.constants.Url;
 import model.Credentials;
-
+import java.util.Optional;
 import static io.restassured.RestAssured.given;
 
 public class BurgerServiceClient {
@@ -66,5 +66,26 @@ public class BurgerServiceClient {
                 .log()
                 .all()
                 .statusCode(202);
+    }
+
+    @Step("User updating data with accessToken, PATCH /api/auth/user")
+    public ValidatableResponse updateUserData(Optional<String> userAccessToken, Credentials credentials) {
+
+        RequestSpecification spec = given();
+        if (userAccessToken.isPresent()) {
+            String token = userAccessToken.get();
+            spec.header("Authorization", token);
+        }
+        return spec
+                .filter(new AllureRestAssured())
+                .log()
+                .all()
+                .baseUri(baseURI)
+                .contentType("application/json")
+                .body(credentials)
+                .patch(Endpoints.UPDATE_USER)
+                .then()
+                .log()
+                .all();
     }
 }
