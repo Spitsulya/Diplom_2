@@ -25,7 +25,7 @@ public class TestCreatingOrder {
     public void setUp() {
 
         client = new BurgerServiceClient();
-        userData = new UserData("emaiiaaaqqqutsulya15@yandex.ru", "password", "Elina");
+        userData = new UserData("malinaelinamalina@yandex.ru", "password", "Elina");
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
         ingredientIds = client.getValidIngredientIds();
     }

@@ -31,7 +31,7 @@ public class TestGetUserOrders {
     public void setUp() {
 
         client = new BurgerServiceClient();
-        userData = new UserData("emaiiahhsghhs15@yandex.ru", "password", "Elina");
+        userData = new UserData("elinamalina15@yandex.ru", "password", "Elina");
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
         ingredientIds = client.getValidIngredientIds();
         firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));

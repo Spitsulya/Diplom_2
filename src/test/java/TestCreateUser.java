@@ -26,7 +26,7 @@ public class TestCreateUser {
     @Description("Positive test for POST request to /api/auth/register endpoint by filling in all required fields")
     public void CreateUserSucessfullyTest() {
 
-        userData = new UserData("maalishhka15@yandex.ru", "password", "elina");
+        userData = new UserData("malinaelinaaa15@yandex.ru", "password", "elina");
         ValidatableResponse response = client.createUserPostRequest(userData);
 
         checkStatusCode200(response);
@@ -38,7 +38,7 @@ public class TestCreateUser {
     @Description("Negative test for POST request to /api/auth/register endpoint by using the same user's data")
     public void CreateTwoIdenticalUsersImpossibleTest() {
 
-        userData = new UserData("mmalishka15@yandex.ru", "password", "elina");
+        userData = new UserData("malinaelinaaaa15@yandex.ru", "password", "elina");
 
         ValidatableResponse response = client.createUserPostRequest(userData);;
         checkStatusCode200(response);
@@ -65,7 +65,7 @@ public class TestCreateUser {
     @Description("Negative test for POST request to /api/auth/register endpoint by not using all required fields")
     public void CreateUserWithoutPasswordImpossibleTest() {
 
-        userData = new UserData("malishka15@yandex.ru", "", "elina");
+        userData = new UserData("malinaelinaa15@yandex.ru", "", "elina");
         ValidatableResponse response = client.createUserPostRequest(userData);
 
         checkStatusCode403f(response);
