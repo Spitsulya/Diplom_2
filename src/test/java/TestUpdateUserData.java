@@ -5,7 +5,6 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import model.Credentials;
 import model.UserData;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,7 +116,7 @@ public class TestUpdateUserData {
                 .body("success", equalTo(true));
     }
 
-    @Step("Check positive update response code (200)")
+    @Step("Check positive update response code (401 Unauthorized)")
     public void checkStatusCode401(ValidatableResponse response) {
         response.log().all().assertThat()
                 .statusCode(SC_UNAUTHORIZED);

@@ -95,17 +95,19 @@ public class BurgerServiceClient {
     }
 
     @Step("Getting list of Burger's valid ingredients for creating a burger, GET /api/ingredients")
-    public Response getValidIngredientIds() {
-        // Получаем список ингредиентов
-          return given()
+    public List<String> getValidIngredientIds() {
+
+        Response response = given()
                 .baseUri(baseURI)
                 .when()
-                .get(Endpoints.GET_ORDER)
+                .get(Endpoints.GET_INGREDIENTS)
                 .then()
                 .log().all()
                 .statusCode(200)
                 .extract()
                 .response();
+
+        return response.body().path("data._id");
     }
 
     @Step("User updating data with accessToken, PATCH /api/auth/user")
@@ -131,5 +133,24 @@ public class BurgerServiceClient {
                 .all();
     }
 
+    @Step("User updating data with accessToken, PATCH /api/auth/user")
+    public ValidatableResponse getUserOrders(Optional<String> userAccessToken) {
+
+        RequestSpecification spec = given();
+        if (userAccessToken.isPresent()) {
+            String token = userAccessToken.get();
+            spec.header("Authorization", token);
+        }
+        return spec
+                .filter(new AllureRestAssured())
+                .log()
+                .all()
+                .baseUri(baseURI)
+                .contentType("application/json")
+                .get(Endpoints.GET_USER_ORDERS)
+                .then()
+                .log()
+                .all();
+    }
 
 }

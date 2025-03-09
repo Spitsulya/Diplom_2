@@ -7,7 +7,9 @@ import model.UserData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -16,22 +18,25 @@ public class TestCreatingOrder {
     private UserData userData;
     private BurgerServiceClient client;
     String userAccessToken;
-    String firstIngredientId;
-    String secondIngredientId;
+    private List<String> ingredientIds;
+    private Random random = new Random();
 
     @Before
     public void setUp() {
+
         client = new BurgerServiceClient();
         userData = new UserData("emaiiaaaqqqutsulya15@yandex.ru", "password", "Elina");
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
-        firstIngredientId = client.getValidIngredientIds().body().path("data[0]._id");
-        secondIngredientId = client.getValidIngredientIds().body().path("data[1]._id");
+        ingredientIds = client.getValidIngredientIds();
     }
 
     @Test
     @DisplayName("Successful creating an order with authorization and added ingredients")
     @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
     public void CreatingOrderWithIngridientsAndAuthSucessfullyTest() {
+
+        String firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
+        String secondIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
 
         ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), firstIngredientId, secondIngredientId);
 
@@ -69,6 +74,9 @@ public class TestCreatingOrder {
     @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
     public void CreatingOrderWithIngridientsAndWithoutAuthImpossibleTest() {
 
+        String firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
+        String secondIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
+
         ValidatableResponse response = client.createOrder(Optional.empty(), firstIngredientId, secondIngredientId);
 
         checkStatusCode400(response);
@@ -93,7 +101,7 @@ public class TestCreatingOrder {
                 .body("success", equalTo(true));
     }
 
-    @Step("Check negative creating response code (200)")
+    @Step("Check negative creating response code (400 Bad request)")
     public void checkStatusCode400(ValidatableResponse response) {
         response.log().all().assertThat()
                 .statusCode(SC_BAD_REQUEST);
@@ -105,7 +113,7 @@ public class TestCreatingOrder {
                 .body("message", equalTo("Ingredient ids must be provided"));
     }
 
-    @Step("Check negative creating response code (200)")
+    @Step("Check negative creating response code (500 Internal server error)")
     public void checkStatusCode500(ValidatableResponse response) {
         response.log().all().assertThat()
                 .statusCode(SC_INTERNAL_SERVER_ERROR);
