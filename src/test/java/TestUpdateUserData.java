@@ -65,7 +65,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (password) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserPasswordWithoutAuthSucessfullyTest() {
+    public void UpdatingUserPasswordWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updatePassword(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
@@ -77,7 +77,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (email) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserEmailWithoutAuthSucessfullyTest() {
+    public void UpdatingUserEmailWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updateEmail(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
@@ -89,7 +89,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (name) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserNameWithoutAuthSucessfullyTest() {
+    public void UpdatingUserNameWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updateName(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
@@ -126,6 +126,6 @@ public class TestUpdateUserData {
     @Step ("Check negative authorization response message {\"message\": \"You should be authorised\"}")
     public void checkResponseBody401(ValidatableResponse response) {
         response.log().all().assertThat()
-                .body("message", CoreMatchers.equalTo("You should be authorised"));
+                .body("message", equalTo("You should be authorised"));
     }
 }

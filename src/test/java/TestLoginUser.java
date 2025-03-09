@@ -28,7 +28,7 @@ public class TestLoginUser {
     @Test
     @DisplayName("Successful authorization of a user")
     @Description("Positive test for POST request to /api/auth/login endpoint by filling in existing data and checking tokens")
-    public void AuthorizationCourierSucessfullyTest() {
+    public void AuthorizationUserSucessfullyTest() {
 
         Credentials credentials = Credentials.fromUserData(userData);
         ValidatableResponse response = client.authorizeUser(credentials);
@@ -40,7 +40,7 @@ public class TestLoginUser {
     @Test
     @DisplayName("Unsuccessful authorization with non-existent user's data")
     @Description("Negative test for POST request to /api/auth/login endpoint by using invalid user's login")
-    public void AuthorizeCourierWithInvalidLoginTest() {
+    public void AuthorizeUserWithInvalidLoginTest() {
 
         Credentials credentials = Credentials.invalidLogin(userData);
         ValidatableResponse response = client.authorizeUser(credentials);
@@ -52,7 +52,7 @@ public class TestLoginUser {
     @Test
     @DisplayName("Unsuccessful authorization with non-existent courier's data")
     @Description("Negative test for POST request to /api/auth/login endpoint by using invalid user's password")
-    public void AuthorizeCourierWithInvalidPasswordTest() {
+    public void AuthorizeUserWithInvalidPasswordTest() {
 
         Credentials credentials = Credentials.invalidPassword(userData);
         ValidatableResponse response = client.authorizeUser(credentials);

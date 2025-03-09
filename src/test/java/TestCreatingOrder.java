@@ -1,0 +1,119 @@
+import client.BurgerServiceClient;
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
+import model.UserData;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import java.util.Optional;
+import static org.apache.http.HttpStatus.*;
+import static org.hamcrest.Matchers.equalTo;
+
+public class TestCreatingOrder {
+
+    private UserData userData;
+    private BurgerServiceClient client;
+    String userAccessToken;
+    String firstIngredientId;
+    String secondIngredientId;
+
+    @Before
+    public void setUp() {
+        client = new BurgerServiceClient();
+        userData = new UserData("emaiiaaaqqqutsulya15@yandex.ru", "password", "Elina");
+        userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
+        firstIngredientId = client.getValidIngredientIds().body().path("data[0]._id");
+        secondIngredientId = client.getValidIngredientIds().body().path("data[1]._id");
+    }
+
+    @Test
+    @DisplayName("Successful creating an order with authorization and added ingredients")
+    @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
+    public void CreatingOrderWithIngridientsAndAuthSucessfullyTest() {
+
+        ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), firstIngredientId, secondIngredientId);
+
+        checkStatusCode200(response);
+        checkResponseBody200(response);
+    }
+
+    @Test
+    @DisplayName("Negative creating an order with authorization and not added ingredients")
+    @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken without added ingredients")
+    public void CreatingOrderWithoutIngridientsAndWithAuthImpossibleTest() {
+
+        ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), null, null);
+
+        checkStatusCode400(response);
+        checkResponseBody400(response);
+    }
+
+    @Test
+    @DisplayName("Negative creating an order with authorization accessToken and added invalid ingredients")
+    @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken and invalid ingredients")
+    public void CreatingOrderWithInvalidIngredientsAndWithAuthImpossibleTest() {
+
+        String invalidIngredientId1 = "61c0c5a71d1f82222bdaaa6d";
+        String invalidIngredientId2 = "61c0c5a71d1f88801bdaaa6d";
+
+        ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), invalidIngredientId1, invalidIngredientId2);
+
+        checkStatusCode500(response);
+        checkResponseBody500(response);
+    }
+
+    @Test
+    @DisplayName("Negative creating an order without authorization and added ingredients")
+    @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
+    public void CreatingOrderWithIngridientsAndWithoutAuthImpossibleTest() {
+
+        ValidatableResponse response = client.createOrder(Optional.empty(), firstIngredientId, secondIngredientId);
+
+        checkStatusCode400(response);
+    }
+
+    @After
+    public void tearDown() {
+        if (userAccessToken != null) {
+            client.deleteUser(userAccessToken);
+        }
+    }
+
+    @Step("Check positive creating response code (200)")
+    public void checkStatusCode200(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .statusCode(SC_OK);
+    }
+
+    @Step ("Check positive response message {success: true}")
+    public void checkResponseBody200(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .body("success", equalTo(true));
+    }
+
+    @Step("Check negative creating response code (200)")
+    public void checkStatusCode400(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .statusCode(SC_BAD_REQUEST);
+    }
+
+    @Step ("Check negative response message {\"message\": \"Ingredient ids must be provided\"}")
+    public void checkResponseBody400(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .body("message", equalTo("Ingredient ids must be provided"));
+    }
+
+    @Step("Check negative creating response code (200)")
+    public void checkStatusCode500(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .statusCode(SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @Step ("Check negative response message {success: true}")
+    public void checkResponseBody500(ValidatableResponse response) {
+        response.log().all().assertThat()
+                .body("success", equalTo(false));
+    }
+}

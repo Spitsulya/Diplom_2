@@ -1,12 +1,17 @@
 package client;
 import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import model.UserData;
 import model.constants.Endpoints;
 import model.constants.Url;
 import model.Credentials;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import static io.restassured.RestAssured.given;
 
@@ -88,4 +93,43 @@ public class BurgerServiceClient {
                 .log()
                 .all();
     }
+
+    @Step("Getting list of Burger's valid ingredients for creating a burger, GET /api/ingredients")
+    public Response getValidIngredientIds() {
+        // Получаем список ингредиентов
+          return given()
+                .baseUri(baseURI)
+                .when()
+                .get(Endpoints.GET_ORDER)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .response();
+    }
+
+    @Step("User updating data with accessToken, PATCH /api/auth/user")
+    public ValidatableResponse createOrder(Optional<String> userAccessToken, String firstIngredientId, String secondIngredientId) {
+
+        RequestSpecification spec = given();
+        if (userAccessToken.isPresent()) {
+            String token = userAccessToken.get();
+            spec.header("Authorization", token);
+        }
+        return spec
+                .filter(new AllureRestAssured())
+                .log()
+                .all()
+                .baseUri(baseURI)
+                .contentType("application/json")
+                .body(new HashMap<String, Object>() {{
+                    put("ingredients", Arrays.asList(firstIngredientId, secondIngredientId));
+                }})
+                .post(Endpoints.CREATE_ORDER)
+                .then()
+                .log()
+                .all();
+    }
+
+
 }
