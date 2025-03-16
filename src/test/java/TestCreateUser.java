@@ -9,68 +9,90 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
+import com.github.javafaker.Faker;
 
 public class TestCreateUser {
 
     private UserData userData;
     private BurgerServiceClient client;
     String userAccessToken;
+    private Faker faker;
 
     @Before
     public void setUp() {
         client = new BurgerServiceClient();
+        faker = new Faker();
     }
 
     @Test
-    @DisplayName("Successful user creation")
+    @DisplayName("Successful user creation with all fields")
     @Description("Positive test for POST request to /api/auth/register endpoint by filling in all required fields")
-    public void CreateUserSucessfullyTest() {
+    public void createUserSuccessfullyTest() {
 
-        userData = new UserData("malinaelinaaa15@yandex.ru", "password", "elina");
+        // Пользователь со всеми валидными данными
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
         ValidatableResponse response = client.createUserPostRequest(userData);
 
         checkStatusCode200(response);
         checkResponseBody200(response);
     }
 
+
     @Test
     @DisplayName("Unsuccessful creation of two identical users")
     @Description("Negative test for POST request to /api/auth/register endpoint by using the same user's data")
-    public void CreateTwoIdenticalUsersImpossibleTest() {
+    public void createTwoIdenticalUsersImpossibleTest() {
 
-        userData = new UserData("malinaelinaaaa15@yandex.ru", "password", "elina");
+        // Пользователь со всеми валидными данными
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
 
         ValidatableResponse response = client.createUserPostRequest(userData);;
         checkStatusCode200(response);
 
         ValidatableResponse response1 = client.createUserPostRequest(userData);;
-        checkStatusCode403e(response1);
-        checkResponseBody403e(response1);
+        checkStatusCode403(response1);
+        checkResponseBody403UserExists(response1);
     }
 
     @Test
     @DisplayName("Unsuccessful creation without user's email")
     @Description("Negative test for POST request to /api/auth/register endpoint by not using all required fields")
-    public void CreateUserWithoutEmailImpossibleTest() {
+    public void createUserWithoutEmailImpossibleTest() {
 
-        userData = new UserData("", "1234", "elina");
+        // Пользователь с невалидным пустым email
+        userData = new UserData("", faker.internet().password(6, 10), faker.name().firstName());
         ValidatableResponse response = client.createUserPostRequest(userData);
 
-        checkStatusCode403f(response);
-        checkResponseBody403f(response);
+        checkStatusCode403(response);
+        checkResponseBody403RequiredFields(response);
     }
 
     @Test
     @DisplayName("Unsuccessful creation without user's password")
     @Description("Negative test for POST request to /api/auth/register endpoint by not using all required fields")
-    public void CreateUserWithoutPasswordImpossibleTest() {
+    public void createUserWithoutPasswordImpossibleTest() {
 
-        userData = new UserData("malinaelinaa15@yandex.ru", "", "elina");
+        // Пользователь с невалидным пустым паролем
+        userData = new UserData(faker.internet().emailAddress(), "", faker.name().firstName());
         ValidatableResponse response = client.createUserPostRequest(userData);
 
-        checkStatusCode403f(response);
-        checkResponseBody403f(response);
+        checkStatusCode403(response);
+        checkResponseBody403RequiredFields(response);
     }
+
+    @Test
+    @DisplayName("Unsuccessful user creation without user's name")
+    @Description("Negative test for POST request to /api/auth/register endpoint by not using all required fields")
+    public void createUserWithoutNameImpossibleTest() {
+
+        // Пользователь с невалидным пустым именем
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), "");
+        ValidatableResponse response = client.createUserPostRequest(userData);
+
+        checkStatusCode403(response);
+        checkResponseBody403RequiredFields(response);
+    }
+
 
     @After
     public void tearDown() {
@@ -95,25 +117,20 @@ public class TestCreateUser {
     }
 
     @Step ("Check negative response code (403 Forbidden)")
-    public void checkStatusCode403e(ValidatableResponse response) {
+    public void checkStatusCode403(ValidatableResponse response) {
         response.log().all().assertThat()
                 .statusCode(SC_FORBIDDEN);
     }
 
     @Step ("Check negative response message {\"message\": \"User already exists\"}")
-    public void checkResponseBody403e(ValidatableResponse response) {
+    public void checkResponseBody403UserExists(ValidatableResponse response) {
         response.log().all().assertThat()
                 .body("message", equalTo("User already exists"));
     }
 
-    @Step ("Check negative response code (403 Forbidden)")
-    public void checkStatusCode403f(ValidatableResponse response) {
-        response.log().all().assertThat()
-                .statusCode(SC_FORBIDDEN);
-    }
 
     @Step ("Check negative response message {\"message\": \"Email, password and name are required fields\"}")
-    public void checkResponseBody403f(ValidatableResponse response) {
+    public void checkResponseBody403RequiredFields(ValidatableResponse response) {
         response.log().all().assertThat()
                 .body("message", equalTo("Email, password and name are required fields"));
     }

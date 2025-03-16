@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Random;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
+import com.github.javafaker.Faker;
 
 public class TestCreatingOrder {
 
@@ -20,12 +21,15 @@ public class TestCreatingOrder {
     String userAccessToken;
     private List<String> ingredientIds;
     private Random random = new Random();
+    private Faker faker;
 
     @Before
     public void setUp() {
 
         client = new BurgerServiceClient();
-        userData = new UserData("malinaelinamalina@yandex.ru", "password", "Elina");
+        faker = new Faker();
+
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
         ingredientIds = client.getValidIngredientIds();
     }
@@ -33,7 +37,7 @@ public class TestCreatingOrder {
     @Test
     @DisplayName("Successful creating an order with authorization and added ingredients")
     @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
-    public void CreatingOrderWithIngridientsAndAuthSucessfullyTest() {
+    public void creatingOrderWithIngredientsAndAuthSuccessfullyTest() {
 
         String firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
         String secondIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
@@ -47,7 +51,7 @@ public class TestCreatingOrder {
     @Test
     @DisplayName("Negative creating an order with authorization and not added ingredients")
     @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken without added ingredients")
-    public void CreatingOrderWithoutIngridientsAndWithAuthImpossibleTest() {
+    public void creatingOrderWithoutIngredientsAndWithAuthImpossibleTest() {
 
         ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), null, null);
 
@@ -58,7 +62,7 @@ public class TestCreatingOrder {
     @Test
     @DisplayName("Negative creating an order with authorization accessToken and added invalid ingredients")
     @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken and invalid ingredients")
-    public void CreatingOrderWithInvalidIngredientsAndWithAuthImpossibleTest() {
+    public void creatingOrderWithInvalidIngredientsAndWithAuthImpossibleTest() {
 
         String invalidIngredientId1 = "61c0c5a71d1f82222bdaaa6d";
         String invalidIngredientId2 = "61c0c5a71d1f88801bdaaa6d";
@@ -72,7 +76,7 @@ public class TestCreatingOrder {
     @Test
     @DisplayName("Negative creating an order without authorization and added ingredients")
     @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
-    public void CreatingOrderWithIngridientsAndWithoutAuthImpossibleTest() {
+    public void creatingOrderWithIngredientsAndWithoutAuthImpossibleTest() {
 
         String firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
         String secondIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));

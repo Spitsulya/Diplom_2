@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import com.github.javafaker.Faker;
 
 
 public class TestGetUserOrders {
@@ -26,16 +27,20 @@ public class TestGetUserOrders {
     String secondIngredientId;
     private List<String> ingredientIds;
     private Random random = new Random();
+    private Faker faker;
 
     @Before
     public void setUp() {
 
         client = new BurgerServiceClient();
-        userData = new UserData("elinamalina15@yandex.ru", "password", "Elina");
+        faker = new Faker();
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
+
         ingredientIds = client.getValidIngredientIds();
         firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
         secondIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
+
         client.createOrder(Optional.of(userAccessToken), firstIngredientId, secondIngredientId);
 
     }
@@ -43,7 +48,7 @@ public class TestGetUserOrders {
     @Test
     @DisplayName("Successful getting user's order with authorization")
     @Description("Positive test for GET request to /api/ingredients endpoint by using authorization accessToken")
-    public void GetUserOrdersWithAuthorizationSucessfullyTest() {
+    public void getUserOrdersWithAuthorizationSuccessfullyTest() {
 
         ValidatableResponse response = client.getUserOrders(Optional.of(userAccessToken));
 
@@ -55,7 +60,7 @@ public class TestGetUserOrders {
     @Test
     @DisplayName("Negative creating an order with authorization and not added ingredients")
     @Description("Negative test for GET request to /api/ingredients endpoint by not using authorization accessToken")
-    public void GetUserOrdersWithoutAuthorizationImpossibleTest() {
+    public void getUserOrdersWithoutAuthorizationImpossibleTest() {
 
         ValidatableResponse response = client.getUserOrders(Optional.empty());
 

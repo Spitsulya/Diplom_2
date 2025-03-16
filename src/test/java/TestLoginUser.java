@@ -11,24 +11,27 @@ import org.junit.Test;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import com.github.javafaker.Faker;
 
 public class TestLoginUser {
 
     private UserData userData;
     private BurgerServiceClient client;
     String userAccessToken;
+    private Faker faker;
 
     @Before
     public void setUp() {
         client = new BurgerServiceClient();
-        userData = new UserData("llllllaaaaa@yandex.ru", "password", "Elina");
+        faker = new Faker();
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
     }
 
     @Test
     @DisplayName("Successful authorization of a user")
     @Description("Positive test for POST request to /api/auth/login endpoint by filling in existing data and checking tokens")
-    public void AuthorizationUserSucessfullyTest() {
+    public void authorizationUserSucessfullyTest() {
 
         Credentials credentials = Credentials.fromUserData(userData);
         ValidatableResponse response = client.authorizeUser(credentials);
@@ -40,7 +43,7 @@ public class TestLoginUser {
     @Test
     @DisplayName("Unsuccessful authorization with non-existent user's data")
     @Description("Negative test for POST request to /api/auth/login endpoint by using invalid user's login")
-    public void AuthorizeUserWithInvalidLoginTest() {
+    public void authorizeUserWithInvalidLoginTest() {
 
         Credentials credentials = Credentials.invalidLogin(userData);
         ValidatableResponse response = client.authorizeUser(credentials);
@@ -52,7 +55,7 @@ public class TestLoginUser {
     @Test
     @DisplayName("Unsuccessful authorization with non-existent courier's data")
     @Description("Negative test for POST request to /api/auth/login endpoint by using invalid user's password")
-    public void AuthorizeUserWithInvalidPasswordTest() {
+    public void authorizeUserWithInvalidPasswordTest() {
 
         Credentials credentials = Credentials.invalidPassword(userData);
         ValidatableResponse response = client.authorizeUser(credentials);

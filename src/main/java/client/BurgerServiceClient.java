@@ -133,7 +133,7 @@ public class BurgerServiceClient {
                 .all();
     }
 
-    @Step("User updating data with accessToken, PATCH /api/auth/user")
+    @Step("User updating data with accessToken, GET /api/orders")
     public ValidatableResponse getUserOrders(Optional<String> userAccessToken) {
 
         RequestSpecification spec = given();

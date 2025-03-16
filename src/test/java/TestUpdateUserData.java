@@ -11,24 +11,27 @@ import org.junit.Test;
 import java.util.Optional;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
+import com.github.javafaker.Faker;
 
 public class TestUpdateUserData {
 
     private UserData userData;
     private BurgerServiceClient client;
     String userAccessToken;
+    private Faker faker;
 
     @Before
     public void setUp() {
         client = new BurgerServiceClient();
-        userData = new UserData("emailspitsulya15@yandex.ru", "password", "Elina");
+        faker = new Faker();
+        userData = new UserData(faker.internet().emailAddress(), faker.internet().password(6, 10), faker.name().firstName());
         userAccessToken = client.createUserPostRequest(userData).extract().path("accessToken");
     }
 
     @Test
     @DisplayName("Successful updating of a user data (password) with authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserPasswordWithAuthSucessfullyTest() {
+    public void updatingUserPasswordWithAuthSuccessfullyTest() {
 
         Credentials credentials = Credentials.updatePassword(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
@@ -40,7 +43,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Successful updating of a user data (email) with authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserEmailWithAuthSucessfullyTest() {
+    public void updatingUserEmailWithAuthSuccessfullyTest() {
 
         Credentials credentials = Credentials.updateEmail(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
@@ -52,7 +55,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Successful updating of a user data (name) with authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserNameWithAuthSucessfullyTest() {
+    public void updatingUserNameWithAuthSuccessfullyTest() {
 
         Credentials credentials = Credentials.updateName(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
@@ -64,7 +67,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (password) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserPasswordWithoutAuthImpossibleTest() {
+    public void updatingUserPasswordWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updatePassword(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
@@ -76,7 +79,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (email) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserEmailWithoutAuthImpossibleTest() {
+    public void updatingUserEmailWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updateEmail(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
@@ -88,7 +91,7 @@ public class TestUpdateUserData {
     @Test
     @DisplayName("Negative updating of a user data (name) without authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void UpdatingUserNameWithoutAuthImpossibleTest() {
+    public void updatingUserNameWithoutAuthImpossibleTest() {
 
         Credentials credentials = Credentials.updateName(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
