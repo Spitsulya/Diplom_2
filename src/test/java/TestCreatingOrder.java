@@ -50,7 +50,7 @@ public class TestCreatingOrder {
     }
 
     @Test
-    @DisplayName("Negative creating an order with authorization and not added ingredients")
+    @DisplayName("Negative creating an order with authorization and without ingredients")
     @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken without added ingredients")
     public void creatingOrderWithoutIngredientsAndWithAuthImpossibleTest() {
 
@@ -61,7 +61,7 @@ public class TestCreatingOrder {
     }
 
     @Test
-    @DisplayName("Negative creating an order with authorization accessToken and added invalid ingredients")
+    @DisplayName("Negative creating an order with authorization and added invalid ingredients")
     @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken and invalid ingredients")
     public void creatingOrderWithInvalidIngredientsAndWithAuthImpossibleTest() {
 
@@ -75,8 +75,8 @@ public class TestCreatingOrder {
     }
 
     @Test
-    @DisplayName("Negative creating an order without authorization and added ingredients")
-    @Description("Positive test for POST request to /api/orders endpoint by filling in valid ingredients and authorization accessToken")
+    @DisplayName("Negative order creation with ingredients and without authorization")
+    @Description("Negative test for POST request to /api/orders endpoint by filling in valid ingredients and not filling in authorization accessToken")
     public void creatingOrderWithIngredientsAndWithoutAuthImpossibleTest() {
 
         String firstIngredientId = ingredientIds.get(random.nextInt(ingredientIds.size()));
@@ -84,6 +84,7 @@ public class TestCreatingOrder {
 
         ValidatableResponse response = client.createOrder(Optional.empty(), firstIngredientId, secondIngredientId);
 
+        // Не авторизованные пользователи не могут создать заказ
         checkStatusCode400(response);
     }
 

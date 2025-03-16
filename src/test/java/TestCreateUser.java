@@ -25,7 +25,7 @@ public class TestCreateUser {
     }
 
     @Test
-    @DisplayName("Successful user creation with all fields")
+    @DisplayName("Successful user creation with all valid fields")
     @Description("Positive test for POST request to /api/auth/register endpoint by filling in all required fields")
     public void createUserSuccessfullyTest() {
 
