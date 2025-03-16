@@ -33,11 +33,18 @@ public class TestUpdateUserData {
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
     public void updatingUserPasswordWithAuthSuccessfullyTest() {
 
+        // Обновляем пароль пользователя
         Credentials credentials = Credentials.updatePassword(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
 
         checkStatusCode200(response);
         checkResponseBody200(response);
+
+        // Проверка успешной авторизации с новым паролем
+        ValidatableResponse authResponse = client.authorizeUser(credentials);
+        checkStatusCode200(authResponse);
+        checkResponseBody200(authResponse);
+
     }
 
     @Test
@@ -45,11 +52,15 @@ public class TestUpdateUserData {
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
     public void updatingUserEmailWithAuthSuccessfullyTest() {
 
+        // Обновляем email пользователя
         Credentials credentials = Credentials.updateEmail(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
 
         checkStatusCode200(response);
         checkResponseBody200(response);
+
+        // Проверка обновленного email в ответе сервера
+        checkUpdatedUserEmail(response, credentials.getEmail());
     }
 
     @Test
@@ -57,11 +68,15 @@ public class TestUpdateUserData {
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
     public void updatingUserNameWithAuthSuccessfullyTest() {
 
+        // Обновляем имя пользователя
         Credentials credentials = Credentials.updateName(userData);
         ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
 
         checkStatusCode200(response);
         checkResponseBody200(response);
+
+        // Проверка обновленного имени в ответе сервера
+        checkUpdatedUserName(response, credentials.getName());
     }
 
     @Test
@@ -72,6 +87,7 @@ public class TestUpdateUserData {
         Credentials credentials = Credentials.updatePassword(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
 
+        // Проверка ошибки сервера обновления данных без авторизации
         checkStatusCode401(response);
         checkResponseBody401(response);
     }
@@ -84,6 +100,7 @@ public class TestUpdateUserData {
         Credentials credentials = Credentials.updateEmail(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
 
+        // Проверка ошибки сервера обновления данных без авторизации
         checkStatusCode401(response);
         checkResponseBody401(response);
     }
@@ -96,6 +113,7 @@ public class TestUpdateUserData {
         Credentials credentials = Credentials.updateName(userData);
         ValidatableResponse response = client.updateUserData(Optional.empty(), credentials);
 
+        // Проверка ошибки сервера обновления данных без авторизации
         checkStatusCode401(response);
         checkResponseBody401(response);
     }
@@ -119,6 +137,18 @@ public class TestUpdateUserData {
                 .body("success", equalTo(true));
     }
 
+    @Step("Check updated 'email' in response")
+    public void checkUpdatedUserEmail(ValidatableResponse response, String expectedEmail) {
+        response.log().all().assertThat()
+                .body("user.email", equalTo(expectedEmail));
+    }
+
+    @Step("Check updated 'name' in response")
+    public void checkUpdatedUserName(ValidatableResponse response, String expectedName) {
+        response.log().all().assertThat()
+                .body("user.name", equalTo(expectedName));
+    }
+
     @Step("Check positive update response code (401 Unauthorized)")
     public void checkStatusCode401(ValidatableResponse response) {
         response.log().all().assertThat()
@@ -128,6 +158,7 @@ public class TestUpdateUserData {
     @Step ("Check negative authorization response message {\"message\": \"You should be authorised\"}")
     public void checkResponseBody401(ValidatableResponse response) {
         response.log().all().assertThat()
+                .body("success", equalTo(false))
                 .body("message", equalTo("You should be authorised"));
     }
 }

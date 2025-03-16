@@ -8,7 +8,6 @@ import model.UserData;
 import model.constants.Endpoints;
 import model.constants.Url;
 import model.Credentials;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -133,7 +132,7 @@ public class BurgerServiceClient {
                 .all();
     }
 
-    @Step("User updating data with accessToken, GET /api/orders")
+    @Step("Getting user's orders with accessToken, GET /api/orders")
     public ValidatableResponse getUserOrders(Optional<String> userAccessToken) {
 
         RequestSpecification spec = given();
@@ -152,5 +151,4 @@ public class BurgerServiceClient {
                 .log()
                 .all();
     }
-
 }

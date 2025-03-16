@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import static org.apache.http.HttpStatus.*;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import com.github.javafaker.Faker;
 
@@ -64,8 +65,8 @@ public class TestCreatingOrder {
     @Description("Negative test for POST request to /api/orders endpoint by filling in authorization accessToken and invalid ingredients")
     public void creatingOrderWithInvalidIngredientsAndWithAuthImpossibleTest() {
 
-        String invalidIngredientId1 = "61c0c5a71d1f82222bdaaa6d";
-        String invalidIngredientId2 = "61c0c5a71d1f88801bdaaa6d";
+        String invalidIngredientId1 = "test1";
+        String invalidIngredientId2 = "test2";
 
         ValidatableResponse response = client.createOrder(Optional.of(userAccessToken), invalidIngredientId1, invalidIngredientId2);
 
@@ -126,6 +127,7 @@ public class TestCreatingOrder {
     @Step ("Check negative response message {success: true}")
     public void checkResponseBody500(ValidatableResponse response) {
         response.log().all().assertThat()
-                .body("success", equalTo(false));
+                .statusCode(SC_INTERNAL_SERVER_ERROR)
+                .body(containsString("Internal Server Error"));
     }
 }
