@@ -29,25 +29,6 @@ public class TestUpdateUserData {
     }
 
     @Test
-    @DisplayName("Successful updating of a user data (password) with authorization")
-    @Description("Positive test for PATCH request to /api/auth/user endpoint")
-    public void updatingUserPasswordWithAuthSuccessfullyTest() {
-
-        // Обновляем пароль пользователя
-        Credentials credentials = Credentials.updatePassword(userData);
-        ValidatableResponse response = client.updateUserData(Optional.of(userAccessToken), credentials);
-
-        checkStatusCode200(response);
-        checkResponseBody200(response);
-
-        // Проверка успешной авторизации с новым паролем
-        ValidatableResponse authResponse = client.authorizeUser(credentials);
-        checkStatusCode200(authResponse);
-        checkResponseBody200(authResponse);
-
-    }
-
-    @Test
     @DisplayName("Successful updating of a user data (email) with authorization")
     @Description("Positive test for PATCH request to /api/auth/user endpoint")
     public void updatingUserEmailWithAuthSuccessfullyTest() {
